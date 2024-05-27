@@ -1,7 +1,7 @@
 import time
 import can
 import numpy as np
-from .mks_enums import MksCommands, MotorShaftProtectionStatus, SuccessStatus, GoBackToZeroStatus, EnableStatus
+from mks_enums import MksCommands, MotorShaftProtectionStatus, SuccessStatus, GoBackToZeroStatus, EnableStatus
 
 class motor_shaft_protection_status_error(Exception):
     """Exception raised for invalid motor shaft protection status."""

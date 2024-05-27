@@ -1,10 +1,10 @@
 from setuptools import find_packages, setup
 
-package_name = 'python_driver'
+package_name = ('manipulator_servo_driver')
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.0.1',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -14,13 +14,12 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='ros',
-    maintainer_email='ros@todo.todo',
+    maintainer_email='stanislav.svediroh@vut.cz',
     description='Interface for mks servo',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
+    license='MIT',
     entry_points={
         'console_scripts': [
-            "mks_interface = python_driver.driver:main",
+            "mks_interface = manipulator_servo_driver.driver:main",
         ],
     },
 )

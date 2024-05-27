@@ -1,19 +1,14 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>python_driver</name>
+  <name>manipulator_servo_driver</name>
   <version>0.0.0</version>
   <description>Interface for mks servo</description>
-  <maintainer email="ros@todo.todo">ros</maintainer>
-  <license>TODO: License declaration</license>
+  <maintainer email="stanislav.svediroh@vut.cz">Stanislav Svědiroh</maintainer>
+  <license>MIT</license>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
 
   <depend>python_driver_interfaces</depend>
 

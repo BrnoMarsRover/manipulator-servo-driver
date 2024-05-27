@@ -1,4 +1,4 @@
-from .mks_enums import Direction, Enable, SaveCleanState, RunMotorResult, MotorStatus, MksCommands
+from mks_enums import Direction, Enable, SaveCleanState, RunMotorResult, MotorStatus, MksCommands
 import time
 
 # constants
@@ -93,7 +93,7 @@ def run_motor_in_speed_mode(self, direction: Direction, speed, acceleration):
     self._validate_speed(speed)
     self._validate_acceleration(acceleration)
 
-    direction_value = 0x80 if direction == Direction.CW else 0
+    direction_value = 0x81 if direction == Direction.CW else 0x01
 
     cmd = [
         direction_value + ((speed >> 8) & 0b1111),

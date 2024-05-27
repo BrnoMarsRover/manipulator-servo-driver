@@ -7,7 +7,7 @@ https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html
 
 ### Install ros control:
 ```
-sudo apt install ros-rolling-ros2-control
+sudo apt install ros-humble-ros2-control
 ```
 
 ### Install ros topic based control:
@@ -47,9 +47,9 @@ Navigate to the control ros2 control .xacro file and in the \<hardware> section 
 Topics use sensor_msgs/JointState.msg format
 
 # How to configure driver
-In src/python_driver/python_driver/driver.py file specify joint count of your robot by modifying JOINT_CNT variable. Interfaces with servos are created automatically with IDs in ascending order and starting with ID 1.
+In src/manipulator_servo_driver/manipulator_servo_driver/driver.py file specify joint count of your robot by modifying JOINT_CNT variable. Interfaces with servos are created automatically with IDs in ascending order and starting with ID 1.
 
-#### Alternativelly you can specify interfaces manually by replacing:
+#### Alternatively you can specify interfaces manually by replacing:
 ```
 self.servos = [ MksServo(self.bus, self.notifier, i+1) for i in range(self.JOINT_CNT) ]
 ```
@@ -62,10 +62,16 @@ self.servos = [
 ```
 where the last argument specifies servo CAN ID.
 
-#### It is also impartant to specify usb device path of your can usb interface by changing *channel* argument:
+#### From the project root directory, run a script to configure can0 interface while the canable is connected to the usb
 ```
-self.bus = can.interface.Bus(interface='slcan', channel='/dev/ttyACM0', bitrate=125000)
+sudo sh ./scripts/configure_can.sh
 ```
+
+#### You can now check if the can0 interface shows up correctly by calling
+```
+ifconfig
+```
+
 
 # How to build
 In workspace root
@@ -78,11 +84,7 @@ source install/setup.bash
 
 # How to run
 ```
-ros2 run python_driver mks_interface 
-```
-In case of permision denied error, update usb device permissions by running:
-```
-sudo chmod 666 /dev/ttyACM0 
+ros2 run manipulator_servo_driver mks_interface 
 ```
 
 # How to use

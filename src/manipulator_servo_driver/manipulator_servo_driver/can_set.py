@@ -2,17 +2,17 @@
 import can
 import time
 #from mks_servo import MksServo
-from .mks_enums import CalibrationResult
-from .mks_enums import WorkMode
-from .mks_enums import SuccessStatus
-from .mks_enums import HoldingStrength
-from .mks_enums import EnPinEnable
-from .mks_enums import Direction
-from .mks_enums import Enable
-from .mks_enums import CanBitrate
-from .mks_enums import EndStopLevel
-from .mks_enums import MksCommands
-from .mks_enums import GoHomeResult, Mode0
+from mks_enums import CalibrationResult
+from mks_enums import WorkMode
+from mks_enums import SuccessStatus
+from mks_enums import HoldingStrength
+from mks_enums import EnPinEnable
+from mks_enums import Direction
+from mks_enums import Enable
+from mks_enums import CanBitrate
+from mks_enums import EndStopLevel
+from mks_enums import MksCommands
+from mks_enums import GoHomeResult, Mode0
 
 class gohome_status_error(Exception):
     """Exception raised for invalid gohome status."""
