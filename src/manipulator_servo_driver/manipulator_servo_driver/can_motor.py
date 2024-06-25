@@ -1,4 +1,4 @@
-from mks_enums import Direction, Enable, SaveCleanState, RunMotorResult, MotorStatus, MksCommands
+from .mks_enums import Direction, Enable, SaveCleanState, RunMotorResult, MotorStatus, MksCommands
 import time
 
 # constants

@@ -4,8 +4,8 @@ import math
 import rclpy.logging
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-from mks_servo import MksServo
-from mks_enums import Direction
+from .mks_servo import MksServo
+from .mks_enums import Direction
 import can
 
 from manipulator_servo_driver_interfaces.srv import ChangeMode, ResetAxis
@@ -25,7 +25,7 @@ class ServoDriver(Node):
         self.bus = can.interface.Bus(interface='socketcan', channel='can0', bitrate=125000)
         self.notifier = can.Notifier(self.bus, [])
         self.servos = [MksServo(self.bus, self.notifier, i) for i in range(1, self.JOINT_CNT + 1)]
-        #self.servos = [MksServo(self.bus, self.notifier, 3)]
+        #self.servos = [MksServo(self.bus, self.notifier, 0)]
         self.mode = 1  # mode: 0 - standby, 1 - position, 2 - speed (currently quite dangerous with the hardware)
 
         for servo in self.servos:

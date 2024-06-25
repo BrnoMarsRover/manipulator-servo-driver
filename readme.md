@@ -18,13 +18,7 @@ sudo apt install ros-humble-topic-based-ros2-control
 
 ### Install python dependencies:
 ```
-pip3 install python-can
-```
-```
-pip3 install pyserial
-```
-```
-pip3 install numpy
+pip3 install python-can pyserial numpy
 ```
 
 ### Navigate to folder /src:
@@ -47,7 +41,7 @@ Navigate to the control ros2 control .xacro file and in the \<hardware> section 
 Topics use sensor_msgs/JointState.msg format
 
 # How to configure driver
-In src/manipulator_servo_driver/manipulator_servo_driver/driver.py file specify joint count of your robot by modifying JOINT_CNT variable. Interfaces with servos are created automatically with IDs in ascending order and starting with ID 1.
+In src/python_driver/python_driver/driver.py file specify joint count of your robot by modifying JOINT_CNT variable. Interfaces with servos are created automatically with IDs in ascending order and starting with ID 1.
 
 #### Alternatively you can specify interfaces manually by replacing:
 ```
@@ -62,16 +56,10 @@ self.servos = [
 ```
 where the last argument specifies servo CAN ID.
 
-#### From the project root directory, run a script to configure can0 interface while the canable is connected to the usb
+#### It is also important to specify can channel by changing *channel* argument:
 ```
-sudo sh ./scripts/configure_can.sh
+self.bus = can.interface.Bus(interface='socketcan', channel='can0', bitrate=125000)
 ```
-
-#### You can now check if the can0 interface shows up correctly by calling
-```
-ifconfig
-```
-
 
 # How to build
 In workspace root
@@ -79,7 +67,7 @@ In workspace root
 colcon build
 ```
 ```
-source install/setup.bash 
+source install/setup.bash
 ```
 
 # How to run
@@ -99,7 +87,7 @@ Don't forget to source the workspace before running the command.
 #### Driver supports 3 different modes:
 - 0 - Standby (joint states are published, command are ignored)
 - 1 - Position (joint states are published, position commands are used) 
-- 2 - Speed (joint states are published, velocity commands are used)  
+- 2 - Speed (joint states are published, velocity commands are used - currently very dangerous with the hardware)  
 
 #### Driver also allows user to reset the servo axis to 0 by calling:
 ```
@@ -114,4 +102,4 @@ ros2 launch ros2_control_demo_example_1 rrbot.launch.py
 ```
 
 # Limitations
-During testing we have observed that servos continue to run even when the communitacion is lost.
+During testing we have observed that servos continue to run even when the communication is lost.
