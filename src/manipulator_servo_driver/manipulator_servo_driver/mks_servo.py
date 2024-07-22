@@ -131,7 +131,7 @@ class MksServo:
     MAX_CALIBRATION_TIME = 20
     MAX_HOMING_TIME = 20
 
-    _calibration_status = CalibrationResult.Unkown
+    _calibration_status = CalibrationResult.Unknown
     _homing_status = GoHomeResult.Unkown
     _motor_run_status = RunMotorResult.RunComplete
 

@@ -8,7 +8,7 @@ from .mks_servo import MksServo
 from .mks_enums import Direction
 import can
 
-from manipulator_servo_driver_interfaces.srv import ChangeMode, ResetAxis
+from manipulator_servo_driver_interfaces.srv import ChangeMode, ResetAxis, HomeAxis
 
 
 class ServoDriver(Node):
@@ -16,10 +16,11 @@ class ServoDriver(Node):
         super().__init__("mks_servo_driver")
         self.JOINT_CNT = 6
 
-        self.subscriber = self.create_subscription(JointState, "mks_servo_joints_cmd", self.on_command, 10)
-        self.publisher = self.create_publisher(JointState, "mks_servo_joints", 10)
-        self.service_change_mode = self.create_service(ChangeMode, "mks_servo_change_mode", self.on_change_mode)
-        self.service_reset_axis = self.create_service(ResetAxis, "mks_servo_reset_axis", self.on_reset_axis)
+        self.subscriber = self.create_subscription(JointState, "manipulator_joints_cmd", self.on_command, 10)
+        self.publisher = self.create_publisher(JointState, "manipulator_joints_state", 10)
+        self.service_change_mode = self.create_service(ChangeMode, "manipulator_change_mode", self.on_change_mode)
+        self.service_reset_axis = self.create_service(ResetAxis, "manipulator_reset_axis", self.on_reset_axis)
+        self.service_home_axis = self.create_service(HomeAxis, "manipulator_home_axis", self.on_home_axis)
 
         self.timer = self.create_timer(0.05, self.update_state)
         self.bus = can.interface.Bus(interface='socketcan', channel='can0', bitrate=125000)
@@ -95,8 +96,12 @@ class ServoDriver(Node):
         return response
 
     def on_reset_axis(self, request, response):
-        for servo in self.servos:
-            servo.set_current_axis_to_zero()
+        self.servos[request.index].set_current_axis_to_zero()
+        response.success = True
+        return response
+
+    def on_home_axis(self, request, response):
+        self.servos[request.index].b_go_home()
         response.success = True
         return response
 

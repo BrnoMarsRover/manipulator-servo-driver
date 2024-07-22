@@ -85,7 +85,7 @@ def wait_for_calibration(self):
         can.CanError: If there is an error in sending the CAN message.    
         calibration_timeout_error: If the calibration took longer than the expected time.
     """     
-    if self._calibration_status == CalibrationResult.Unkown:
+    if self._calibration_status == CalibrationResult.Unknown:
         raise calibration_not_running("")
 
     start_time = time.perf_counter()
