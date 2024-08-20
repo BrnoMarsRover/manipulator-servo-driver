@@ -349,7 +349,7 @@ def set_home(self, homeTrig : EndStopLevel, homeDir: Direction, homeSpeed, endLi
 
     Note: Same as the "HmTrig", "HmDir" and "HmSpeed" options on screen.
 
-    Note: When first time to using the endLimit function or changing the limit paramters, it is necessary to go home.
+    Note: When first time to using the endLimit function or changing the limit parameters, it is necessary to go home.
     """       
     return self.set_generic_status(MksCommands.SET_HOME_COMMAND, [homeTrig.value, homeDir.value, (homeSpeed >> 8) & 0xF, homeSpeed & 0xFF, endLimit.value])
 

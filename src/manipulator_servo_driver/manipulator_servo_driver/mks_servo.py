@@ -129,13 +129,13 @@ class MksServo:
     GENERIC_RESPONSE_LENGTH = 3
     DEFAULT_TIMEOUT = 1
     MAX_CALIBRATION_TIME = 20
-    MAX_HOMING_TIME = 20
+    MAX_HOMING_TIME = 120
 
     _calibration_status = CalibrationResult.Unknown
     _homing_status = GoHomeResult.Unkown
     _motor_run_status = RunMotorResult.RunComplete
 
-    def __init__ (self, bus, notifier, id):
+    def __init__ (self, bus, notifier, id, homing_speed):
         """Inits MksServo with the CAN bus and servo ID.
 
         Args:
@@ -143,41 +143,41 @@ class MksServo:
             can_id (int): The CAN ID for this servo.
         """     
 
-        def monitor_incomming_messages(message):
+        def monitor_incoming_messages(message):
             try:                                  
                 if message.arbitration_id == self.can_id:
                     self.check_msg_crc(message)
-                    if (message.data[0] == MksCommands.MOTOR_CALIBRATION_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH):
+                    if message.data[0] == MksCommands.MOTOR_CALIBRATION_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH:
                         status_int = int.from_bytes(message.data[1:2], byteorder='big')  
                         try:
                             self._calibration_status = self.CalibrationResult(status_int)                            
                         except ValueError:
                             logging.warning(f"No enum member with value {status_int}")    
-                    elif (message.data[0] == MksCommands.RUN_MOTOR_RELATIVE_MOTION_BY_PULSES_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH):
+                    elif message.data[0] == MksCommands.RUN_MOTOR_RELATIVE_MOTION_BY_PULSES_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH:
                         status_int = int.from_bytes(message.data[1:2], byteorder='big')  
                         try:
                             self._motor_run_status = self.RunMotorResult(status_int)                            
                         except ValueError:
                             logging.warning(f"No enum member with value {status_int}")      
-                    elif (message.data[0] == MksCommands.RUN_MOTOR_ABSOLUTE_MOTION_BY_PULSES_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH):
+                    elif message.data[0] == MksCommands.RUN_MOTOR_ABSOLUTE_MOTION_BY_PULSES_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH:
                         status_int = int.from_bytes(message.data[1:2], byteorder='big')  
                         try:
                             self._motor_run_status = self.RunMotorResult(status_int)                            
                         except ValueError:
                             logging.warning(f"No enum member with value {status_int}")  
-                    elif (message.data[0] == MksCommands.RUN_MOTOR_RELATIVE_MOTION_BY_AXIS_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH):
+                    elif message.data[0] == MksCommands.RUN_MOTOR_RELATIVE_MOTION_BY_AXIS_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH:
                         status_int = int.from_bytes(message.data[1:2], byteorder='big')  
                         try:
                             self._motor_run_status = self.RunMotorResult(status_int)                            
                         except ValueError:
                             logging.warning(f"No enum member with value {status_int}")                                                                                                                                      
-                    elif (message.data[0] == MksCommands.RUN_MOTOR_ABSOLUTE_MOTION_BY_AXIS_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH):
+                    elif message.data[0] == MksCommands.RUN_MOTOR_ABSOLUTE_MOTION_BY_AXIS_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH:
                         status_int = int.from_bytes(message.data[1:2], byteorder='big')  
                         try:
                             self._motor_run_status = self.RunMotorResult(status_int)                            
                         except ValueError:
                             logging.warning(f"No enum member with value {status_int}")                                                       
-                    elif (message.data[0] == MksCommands.GO_HOME_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH):
+                    elif message.data[0] == MksCommands.GO_HOME_COMMAND.value and len(message.data) == self.GENERIC_RESPONSE_LENGTH:
                         status_int = int.from_bytes(message.data[1:2], byteorder='big')  
                         try:
                             self._homing_status = self.GoHomeResult(status_int)                            
@@ -194,10 +194,11 @@ class MksServo:
             return True
                    
         self.can_id = id
+        self.homing_speed = homing_speed
         self.bus = bus
         self.notifier = notifier
         self.timeout = MksServo.DEFAULT_TIMEOUT
-        self.notifier.add_listener(monitor_incomming_messages)
+        self.notifier.add_listener(monitor_incoming_messages)
 
     def _bool_to_int(self, value):
         """

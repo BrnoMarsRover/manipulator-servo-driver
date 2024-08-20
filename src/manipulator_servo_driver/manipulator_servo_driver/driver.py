@@ -5,7 +5,7 @@ import rclpy.logging
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from .mks_servo import MksServo
-from .mks_enums import Direction
+from .mks_enums import Direction, EndStopLevel, Enable, CanBitrate
 import can
 
 from manipulator_servo_driver_interfaces.srv import ChangeMode, ResetAxis, HomeAxis
@@ -15,7 +15,7 @@ class ServoDriver(Node):
     def __init__(self):
         super().__init__("mks_servo_driver")
         self.JOINT_CNT = 6
-
+        self.HOMING_SPEEDS = [30, 100, 100, 100, 30, 30]
         self.subscriber = self.create_subscription(JointState, "manipulator_joints_cmd", self.on_command, 10)
         self.publisher = self.create_publisher(JointState, "manipulator_joints_state", 10)
         self.service_change_mode = self.create_service(ChangeMode, "manipulator_change_mode", self.on_change_mode)
@@ -25,8 +25,8 @@ class ServoDriver(Node):
         self.timer = self.create_timer(0.05, self.update_state)
         self.bus = can.interface.Bus(interface='socketcan', channel='can0', bitrate=125000)
         self.notifier = can.Notifier(self.bus, [])
-        self.servos = [MksServo(self.bus, self.notifier, i) for i in range(1, self.JOINT_CNT + 1)]
-        #self.servos = [MksServo(self.bus, self.notifier, 0)]
+        self.servos = [MksServo(self.bus, self.notifier, i, self.HOMING_SPEEDS[i - 1]) for i in range(1, self.JOINT_CNT + 1)]
+        #self.servos = [MksServo(self.bus, self.notifier, 0, 30)]
         self.mode = 1  # mode: 0 - standby, 1 - position, 2 - speed (currently quite dangerous with the hardware)
 
         for servo in self.servos:
@@ -36,8 +36,9 @@ class ServoDriver(Node):
 
     def servo_init(self, servo):
         servo.set_work_mode(MksServo.WorkMode.SrvFoc)
+        servo.set_home(EndStopLevel.Low, Direction.CW, servo.homing_speed, Enable.Disable)
         servo.set_subdivisions(64)
-        servo.set_working_current(2400)
+        servo.set_working_current(3000)
         servo.emergency_stop_motor()
 
     # STATE UPDATES

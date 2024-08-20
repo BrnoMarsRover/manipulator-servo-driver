@@ -35,8 +35,8 @@ sudo rosdep install --from-paths ./ -i -y --rosdistro ${ROS_DISTRO}
 Navigate to the control ros2 control .xacro file and in the \<hardware> section include topic based plugin together with topic definition for state and command:
 ```
 <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
-<param name="joint_commands_topic">/mks_servo_joints_cmd</param>
-<param name="joint_states_topic">/mks_servo_joints</param>
+<param name="joint_commands_topic">/manipulator_joints_cmd</param>
+<param name="joint_states_topic">/manipulator_joints_state</param>
 ```
 Topics use sensor_msgs/JointState.msg format
 
@@ -45,16 +45,16 @@ In src/python_driver/python_driver/driver.py file specify joint count of your ro
 
 #### Alternatively you can specify interfaces manually by replacing:
 ```
-self.servos = [ MksServo(self.bus, self.notifier, i+1) for i in range(self.JOINT_CNT) ]
+self.servos = [ MksServo(self.bus, self.notifier, i, self.HOMING_SPEEDS[i - 1]) for i in range(1, self.JOINT_CNT + 1) ]
 ```
 with:
 ```
 self.servos = [
-    MksServo(self.bus, self.notifier, 1),
-    MksServo(self.bus, self.notifier, 5)
+    MksServo(self.bus, self.notifier, 1, self.HOMING_SPEEDS[1]),
+    MksServo(self.bus, self.notifier, 5, self.HOMING_SPEEDS[5])
 ]
 ```
-where the last argument specifies servo CAN ID.
+where the second to last argument specifies servo CAN ID.
 
 #### It is also important to specify can channel by changing *channel* argument:
 ```
@@ -76,7 +76,9 @@ ros2 run manipulator_servo_driver mks_interface
 ```
 
 # How to use
-By default, the driver is in standby mode (mode 0). In this mode joint states are published and all commands are ignored.
+~~By default, the driver is in standby mode (mode 0). In this mode joint states are published and all commands are ignored.~~
+
+Set to position mode by default for easier development
 
 Mode can be changed by calling mks_servo_change_mode service:
 ```
@@ -87,7 +89,7 @@ Don't forget to source the workspace before running the command.
 #### Driver supports 3 different modes:
 - 0 - Standby (joint states are published, command are ignored)
 - 1 - Position (joint states are published, position commands are used) 
-- 2 - Speed (joint states are published, velocity commands are used - currently very dangerous with the hardware)  
+- 2 - Speed (joint states are published, velocity commands are used - currently very dangerous with the hardware. In the future, it would be a good idea to test velocity mode with a separate motor)  
 
 #### Driver also allows user to reset the servo axis to 0 by calling:
 ```
